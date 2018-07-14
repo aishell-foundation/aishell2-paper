@@ -19,15 +19,14 @@
 AISHELL-1 is by far the largest open-source speech corpus available for Mandarin
 speech recognition research. It was released with a baseline system containing
 training and testing pipelines for Mandarin ASR. In AISHELL-2, 1000 hours of
-clean read-speech data is published, which is free for academic usage. On top of
+clean read-speech data from iOS is published, which is free for academic usage. On top of
 AISHELL-2 corpus, an improved recipe is developed and released, containing key
 components for industrial applications, such as Chinese word segmentation,
-robust data augmentation, domain-specific fine-tuning towards acoustic model and
-language model, flexible vocabulary expension and phone set transformation,
-etc. Pipelines supporting various state-of-the-art techniques are provided, such
-as recurrent neural network acoustic models. Moreover, a real-time ASR demo is
-released, to help AISHELL-2 users evaluate and experience target ASR system via
-their own laptop microphone. For research community, we hope that AISHELL-2
+flexible vocabulary expension and phone set transformation etc. 
+Pipelines support various state-of-the-art techniques, such
+as time-delayed neural networks and Lattic-Free MMI objective funciton. 
+In addition, we also release dev and test data from other channels(Android and Mic). 
+For research community, we hope that AISHELL-2
 corpus can be a solid resource for topics like transfer learning and robust
 ASR. For industry, we hope AISHELL-2 recipe can be a helpful reference for
 building meaningful industrial systems and products.
@@ -61,23 +60,19 @@ it has begun doing goods for researchers who need high quality Mandarin speech d
 % effort of knowledage transfering from the research topic to application domain
 % is enourmously high, and is normally off the record.
 
-Furthering the success of AISHELL-1, in this rest of this paper, we officially announce and gently introduce AISHELL-2 with baseline systems developed as well as reference statistics for industrial-scale Mandarin ASR research.
-%research. AISHELL-2 contains around 1000 hours of clean read-speech data, which is free
-%for academic usage. On top of AISHELL-2 corpus, an improved speech recognition
-%recipe is published. Firstly, it contains must-have components for Mandarin ASR,
-%such as Chinese word segmentation, and a new design for customizable Chinese
-%lexicon. Secondly, it presents some effective and straight forward approaches
-%for large-scale ASR system tuning, such as robust data augmentation, acoustic
-%channel fine-tuning, and domain adaptation via language model
-%interpolation. Moreover, a real-time ASR demo is provided, to help not only
-%AISHELL-2 users, but also other recipe developers, to try their ASR systems via
-%their own laptop microphone.
-%
-%This paper is organized as below. 
-Section 2 introduces the structure and specifications of the AISHELL-2 corpus. Section 3 describes the AISHELL-2
-baseline recipe, including data preparation, GMM training, DNN training, and the
-evaluations. Section 4 presents some effective procedures to transfer a large
-scale ASR baseline to a target application.
+In this paper, we introduce AISHELL-2 corpus and AISHELL-2 recipe, as a complete 
+self-contained baseline for industrial-scale Mandarin ASR research. 
+Firstly, AISHELL-2 contains 1000 hours of clean read-speech data, which is free 
+for academic usage. Secondly, an improved speech recognition
+recipe is published, it contains must-have components for Mandarin ASR,
+such as Chinese word segmentation, and a new design for customizable Chinese
+lexicon, etc. Moreover, AISHELL-2 release dev and test data from different acoustic channels(Android and Mic),
+these should be fruitful resources for transfer learning and robust ASR research.
+
+This paper is organized as below. Section 2 introduces the structure and
+specifications of the AISHELL-2 corpus. Section 3 describes the AISHELL-2
+baseline recipe, including data preparation, GMM training, DNN training.
+Section 4 presents baseline system evaluation results.
 
 \section{The AISHELL-2 corpus}
 
@@ -99,12 +94,9 @@ The AISHELL-2 corpus contains 1000 hours of clean speech. The raw data was recor
 
 \section{The AISHELL-2 recipe}
 
-Based on AISHELL-2 corpus, a baseline Kaldi recipe is also released, including
-data processing, robustness data augmentation, acoustic model and language model
-training, test set
-evaluation\footnote{https://github.com/aishell-foundation/aishell-2}. Although
-mostly based on standard Kaldi recipe, AISHELL-2 recipe is different in several
-ways.
+Based on AISHELL-2 corpus, a baseline Kaldi recipe is developed, including
+data processing, acoustic model and language model
+training, test set evaluation.
 
 \subsection{Lexicon and word segmentation}
 
@@ -145,57 +137,6 @@ toolkit called Jieba~\cite{jieba}, it implements a trie-tree based algorithm and
 supports vocabulary customization.  Base on DaCiDian and Jieba, we provide a
 script to segment AISHELL-2 acoustic data transcription and language model text.
 
-\subsection{Audio augmentation}
-
-Most commercial systems are designed to deal with spontaneous speech. However,
-due to legal issues and user privacy protection, spontaneous speech data is not
-always feasible or too expensive to collect. So we design AISHELL-2 as a clean
-read-speech database. As expected, AISHELL-2 system is by nature not as robust
-as those commercial systems powered by real-user speech data. To alleviate this
-problem, we applied several perturbation approaches to enhance system
-robustness.
-
-\begin{itemize}
-\item speech-rate perturbation
-
-  In~\cite{tomko}, author compared two types of speech-rate perturbation: speed
-  and tempo. They are equivalent in terms of tuning speech-rate. But in
-  practice, improper speed perturbation parameters (large speed-up or slow-down
-  effect) lead to frequency domain distortion. So we choose tempo perturbation,
-  to adapt slow read-speech to fast spontaneous speech.
-
-\item volume perturbation
-
-  standard Kaldi recipe uses scale factor to control volume perturbation. For
-  typical setup, all utterances are scaled by a random number between [0.125,
-    2]. However in practice, we found that improper scale-range setup, collided
-  with utterance with unexpected volume, leads to severe saturation or
-  silence-like perturbation. In AISHELL-2, we propose and implement volume
-  perturbation in a slightly different way. Instead of scale-factor controlling,
-  we implemented target-volume controlling. We first probed the volume for each
-  utterance, and scale the entire utterance with a random scale, so that its max
-  sample value lies in a target range, such as [800, 32000].
-
-\item noise robustness
-
-  AISHELL-2 system is vulnerable to background noise because the entire corpus
-  is recorded in silent environment. Although clean data is not directly
-  suitable for commercial system, we can add specific noise on clean data to
-  simulate real world speech data. Unfortunately, until the release of
-  AISHELL-2, we are not able to collect a diverse noise library.
-
-  Noise library might be our next plan, but at the moment, we hope
-  \begin{itemize}
-    \item For research community, AISHELL-2 database could be a helpful
-      ingredient to explore more effective techniques for robust ASR research.
-    \item For industry, we encourage developers to collect noise library of
-      their own interests, clean AISHELL-2 data combined with these noise and
-      simulation techniques, should be enough to breed a usable baseline
-      product, then developers could open the gate to collect real world user
-      data and iterate their products.
-  \end{itemize}
-\end{itemize}
-
 \subsection{Acoustic model}
 
 Two versions of the acoustic model training pipelines are provided, including
@@ -215,20 +156,22 @@ four steps are 605, 3216, 5720 and 8080 respectively.
 
 GMM training of the AISHELL-2 terminates at the speaker independent stage
 without speaker dependent transform, such as fMLLR. From privacy point of view,
-it is often impractical to use customers' personal data and account
+it is impractical to use customers' personal data and account
 infomation. From architecture point of view, deploying a large scale
 speaker-dependent commercial system is complex and costly. Therefore, AISHELL-2
-adopts a simplified speaker independent style for GMM training. Moreover,
-spending time and computation in GMM stage is not very helpful for final
-performance.
+adopts speaker independent GMM training. Moreover, it's not worth 
+spending too much time and computation power in GMM stage, since the final system 
+performance primarily depends on later NN models.
 
-Neural network acoustic models are trained using 80 dimensional filter bank
-features. A time-delay neural network (TDNN) with 4 time-delay layers and 2
-full-connect layers is trained using batch normalization~\cite{tdnn}. All of the
-layers use 850 output RELU neurons~\cite{relu}. A recurrent neural network with
-3 LSTM layers is trained using chunked BPTT with a output delay factor of
-5~\cite{lstm}. Each of the LSTM layers contains 1024 cells and a projection of
-256 output neurons~\cite{lstmp}.
+TODO update NN AM topo and training description here
+
+% Neural network acoustic models are trained using 80 dimensional filter bank
+% features. A time-delay neural network (TDNN) with 4 time-delay layers and 2
+% full-connect layers is trained using batch normalization~\cite{tdnn}. All of the
+% layers use 850 output RELU neurons~\cite{relu}. A recurrent neural network with
+% 3 LSTM layers is trained using chunked BPTT with a output delay factor of
+% 5~\cite{lstm}. Each of the LSTM layers contains 1024 cells and a projection of
+% 256 output neurons~\cite{lstmp}.
 
 \subsection{Language model}
 
@@ -237,17 +180,18 @@ scripts. Out-of-vocabulary (OOV) words are mapped into $<$UNK$>$. The language
 model is trained using Kneser-Ney smoothing and the final model has 516552
 unigrams, 1498603 bigrams and 932475 trigrams.
 
-\subsection{Evaluations}
+\section{Evaluations}
 
 The presented baseline system is trained on a standalone server with ordinary
 configurations. The CPU is Intel Xeon processor of 2.3GHz and the GPUs are four
-Nvidia Titan Xp. Character Error Rate (CER) is used as evaluation metric because
-it is widely adopted in Mandarin ASR community. The results along with the total
-training time of each model are presented in Table~\ref{tab:base}. Note that
-during training we only use iOS data for acoustic modeling, but we evaluate
+Nvidia Titan Xp. Character Error Rate (CER) is used as evaluation metric. 
+The results along with the total training time of each model are presented in Table~\ref{tab:base}. 
+Note that during training we only use iOS data for acoustic modeling, but we evaluate
 these models on dev and test sets for all 3 channels(Android, Mic, and iOS). As
 expected, system performance on iOS outperforms Android and Mic, due to better
 acoustic channel matching between training and testing.
+
+TODO update "improved" recipe result, including results on iOS, Android and Mic
 
 \begin{table*}[th]
   \caption{Baseline system results and training time}
@@ -283,80 +227,61 @@ acoustic channel matching between training and testing.
   \end{tabular}
 \end{table*}
 
-\section{Customizing a speech recognition system}
-
-One major barrier that stops the transforming from research prototypes into
-industrial applications is the scale of training data. Now that AISHELL-2 corpus
-and baseline system have been released, the potential of transforming the
-Mandarin ASR research into industrial scale can be fully discovered by
-customizing a speech recognition system based on the AISHELL-2
-baseline. Customizing a speech recognition system requires transferring the
-knowledge of a baseline system into a specific scenario which suits the target
-application. The knowledge include the channel through which the speech data is
-collected, and the language domain context of target applications.
-
-\subsection{Acoustic channel fine-tuning}
-
-Table~\ref{tab:base} shows that channel mismatch introduces significant
-performance decay. To alleviate this type of problem, various adaptation and
-transfer learning techniques have been proposed, depending on the amount of
-available matched data~\cite{adapt}. In AISHELL-2, we experiment the most
-straight forward method - acoustic model finetuning. A finetune recipe is
-provided, which takes matched data and mismatched model as input, and produces
-adapted model that suits the target channel. In the experiment, 100 hours of
-data from the mic channel is forced-aligned and fed into the baseline TDNN model
-(trained with ios data) via standard back-propagation, and results are shown in
-Table~\ref{tab:trans}. By transferring the channel of acoustic model, the
-performance on the matched subset, a.k.a. the mic subset, is significantly
-improved. Meanwhile, there is slight regression of the performance on the
-android subset. The performance on the android subset is also improved, which
-might due to better robustness of the acoustic model.
-
-\subsection{Language domain adaptation}
-
-The domain of language model is also crucial for applicational ASR
-systems. LM training text of AISHELL-2 are mostly collected from smart-home
-domain. In order to demonstrate domain transfer, we delibrately designed dev and
-test sets from general domain, then we collected 3 million sentences in addition
-(approximately 100 megabytes of text) from same domain as dev and test sets. The
-texts are segmented using the method as in Section 3.1. A trigram is estimated
-using modified Kneser-Ney smoothing~\cite{kn} and interpolated with the
-baseline LM using a weight of 0.5. During evaluation, the baseline AM is coupled
-with this interpolated LM. Table~\ref{tab:trans} shows that, by applying domain
-transfer, CER is decreased by approximately 45\% on all the subsets.
-
-Furthermore, we combined the finetuned AM with the interpolated LM. The results
-are shown in the last row of Table~\ref{tab:trans}. The CER of all subsets for
-all channels are further decreased to around 6\%, suggesting that the robustness
-and performance of the baseline system is significantly improved via simple
-acoustic and language model transfer learning.
-
-
-\subsection{Real-time demo system}
-
-Unlike most of the other open-source ASR recipes, AISHELL-2 provides a real-time
-demo so that developers can actually try their ASR systems via laptop
-microphone. We used PortAudio to capture laptop microphone and stream speech
-data into Kaldi's online decoder in real-time, partial and final recognition
-results are flushed periodically on laptop screen, like a real-time commercial
-speech transcriber.
-
-Although acoustic channel mismatch (between AM and laptop mic) may degrade the
-ASR performance, the point is that we extend recipe's evaluation approach beyond
-sole WER numbers. We believe this end-to-end experience may help researchers and
-industry developers get a first-hand idea on how well their models perform.
+% \section{Customizing a speech recognition system}
+% 
+% One major barrier that stops the transforming from research prototypes into
+% industrial applications is the scale of training data. Now that AISHELL-2 corpus
+% and baseline system have been released, the potential of transforming the
+% Mandarin ASR research into industrial scale can be fully discovered by
+% customizing a speech recognition system based on the AISHELL-2
+% baseline. Customizing a speech recognition system requires transferring the
+% knowledge of a baseline system into a specific scenario which suits the target
+% application. The knowledge include the channel through which the speech data is
+% collected, and the language domain context of target applications.
+% 
+% \subsection{Acoustic channel fine-tuning}
+% 
+% Table~\ref{tab:base} shows that channel mismatch introduces significant
+% performance decay. To alleviate this type of problem, various adaptation and
+% transfer learning techniques have been proposed, depending on the amount of
+% available matched data~\cite{adapt}. In AISHELL-2, we experiment the most
+% straight forward method - acoustic model finetuning. A finetune recipe is
+% provided, which takes matched data and mismatched model as input, and produces
+% adapted model that suits the target channel. In the experiment, 100 hours of
+% data from the mic channel is forced-aligned and fed into the baseline TDNN model
+% (trained with ios data) via standard back-propagation, and results are shown in
+% Table~\ref{tab:trans}. By transferring the channel of acoustic model, the
+% performance on the matched subset, a.k.a. the mic subset, is significantly
+% improved. Meanwhile, there is slight regression of the performance on the
+% android subset. The performance on the android subset is also improved, which
+% might due to better robustness of the acoustic model.
+% 
+% \subsection{Language domain adaptation}
+% 
+% The domain of language model is also crucial for applicational ASR
+% systems. LM training text of AISHELL-2 are mostly collected from smart-home
+% domain. In order to demonstrate domain transfer, we delibrately designed dev and
+% test sets from general domain, then we collected 3 million sentences in addition
+% (approximately 100 megabytes of text) from same domain as dev and test sets. The
+% texts are segmented using the method as in Section 3.1. A trigram is estimated
+% using modified Kneser-Ney smoothing~\cite{kn} and interpolated with the
+% baseline LM using a weight of 0.5. During evaluation, the baseline AM is coupled
+% with this interpolated LM. Table~\ref{tab:trans} shows that, by applying domain
+% transfer, CER is decreased by approximately 45\% on all the subsets.
+% 
+% Furthermore, we combined the finetuned AM with the interpolated LM. The results
+% are shown in the last row of Table~\ref{tab:trans}. The CER of all subsets for
+% all channels are further decreased to around 6\%, suggesting that the robustness
+% and performance of the baseline system is significantly improved via simple
+% acoustic and language model transfer learning.
 
 \section{Conclusions}
 
-In this paper, AISHELL-2 Mandarin corpus and AISHELL-2 recipes are released,
+In this paper, AISHELL-2 Mandarin corpus and AISHELL-2 recipe are released,
 freely available to research community, for building industrial scale research
 baselines. We hope this open-source project may provide essential gradients for
 researchers to explore more scalable techniques regarding to industrial
-issues. To customize a research baseline into industrial application, we discuss
-and experiment different approaches to deal with system robustness, acoustic
-channel mismatch and application domain mismatch. Further more, by developing
-a real-time ASR demo program, we establish a bridge between Character-Error-Rate
-evaluation and first-hand experience via laptop microphone.
+issues. 
 
 \section{Acknowledgements}
 
