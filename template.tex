@@ -35,7 +35,7 @@ building meaningful industrial systems and products.
 
 \section{Introduction}
 
-Automatic Speech recognition (ASR) is one of the application domains in the bloom of Artificial
+Automatic Speech Recognition (ASR) is one of the application domains in the bloom of Artificial
 Intelligence (AI) which recently received huge attention. Huge effort has been made in both research and industry
 to improve ASR system performance. Among all solutions, Deep Learning has been dominating
 this field in the recent half decade. One advantage offered by it is that neural network (NN) models generally turn out to be more robust when
@@ -49,8 +49,11 @@ application data. Number of ASR solutions, as a result, mostly can not scale wel
 %COCO~\cite{coco}. However, in the field of Mandarin ASR, there was no free
 %corpus with sufficient amount of high quality speech data to build a meaningful
 %research baseline, until the release of AISHELL-1~\cite{aishell1}.
-It contains 170 hours of Mandarin speech with high quality human transcriptions. Various training and evaluation recipes based on such corpus have been released on Kaldi~\cite{kaldi}, which is a large and robust framework for speech research. To the best knowledge of the authors, it is the first fully open-sourced corpus for Mandarin ASR and
-it has begun doing goods for researchers who need high quality Mandarin speech data(e.g. ~\cite{do2017, do2018_1, do2018_2}).
+It contains 170 hours of Mandarin speech with high quality human transcriptions. 
+Various training and evaluation recipes based on such corpus have been released on Kaldi~\cite{kaldi}, 
+which is a large and robust framework for speech research. 
+To the best knowledge of the authors, it is the first fully open-sourced system for Mandarin ASR with 
+high quality Mandarin speech data(e.g. ~\cite{do2017, do2018_1, do2018_2}).
 
 % Another issue with the Mandarin speech recognition research is that, there is
 % still gap between a research prototype for demonstration and a working system
@@ -60,21 +63,20 @@ it has begun doing goods for researchers who need high quality Mandarin speech d
 % effort of knowledage transfering from the research topic to application domain
 % is enourmously high, and is normally off the record.
 
-In this paper, we introduce AISHELL-2 corpus and AISHELL-2 recipe, as a 
-self-contained baseline for industrial-scale Mandarin ASR research. 
+In this paper, we introduce AISHELL-2, as a self-contained baseline for industrial-scale Mandarin ASR research. 
 Firstly, 1000 hours of clean read-speech data(from iOS channel) are released to research community for free.
-Secondly, an ASR recipe is developed, containing must-have components 
-such as Chinese word segmentation, a customizable Chinese lexicon, etc. 
-Moreover, AISHELL-2 contains dev and test data from 3 different acoustic channels(iOS, Android and Mic),
+Secondly, an ASR recipe is developed, containing must-have components such as Chinese word segmentation, 
+customizable Chinese lexicon, etc. 
+Moreover, AISHELL-2 releases dev and test data from 3 different acoustic channels(iOS, Android and Mic),
 we hope these resources would be helpful for transfer learning and robust ASR research.
 
 This paper is organized as below. Section 2 introduces AISHELL-2 corpus. 
-Section 3 describes AISHELL-2 mandarin ASR baseline system, including data preparation, lexicon, GMM and Neural Network training.
+Section 3 describes AISHELL-2 mandarin ASR baseline, including data preparation, lexicon, GMM and Neural Network training.
 Section 4 presents system performance on test sets from different acoustic channels.
 
 \section{AISHELL-2 corpus}
 
-The AISHELL-2 corpus contains 1000 hours of clean speech. The raw data was recorded under a multi-channel environment with three devices - a high fidelity microphone, an Android smartphone and an iPhone. The relative position of speaker and devices are shown in Figure~\ref{fig:setup}. The data recorded by the iPhone is the one open-sourced. Speaker, environment and content coverage are fully considered and explained as below:
+AISHELL-2 corpus contains 1000 hours of clean speech. Raw data was recorded under a multi-channel environment with three devices - a high fidelity microphone, an Android smartphone and an iPhone. The relative position of speaker and devices are shown in Figure~\ref{fig:setup}. The data recorded by the iPhone is the one open-sourced. Speaker, environment and content coverage are fully considered and explained as below:
 \begin{itemize}
 \item There are 1991 speakers participated in the recording, including 845 male speakers and 1146 female speakers. Age of speaker ranges from 11 to over 40. Ideally the speakers shall speak everything to be recorded in Mandarin, while there are some slight accent variations. Generally speaking of the accents, there were 1293 speakers using Northern ones, 678 speakers using Southern ones and 20 speakers use other accents during recording. 
 \item 1347 speakers got themselves recorded in a studio while the rest were in a living room with natural reverberation.
@@ -88,7 +90,11 @@ The AISHELL-2 corpus contains 1000 hours of clean speech. The raw data was recor
   \label{fig:setup}
 \end{figure}
 
-\noindent Aside from the part of the AISHELL-2 corpus introduced above, which is supposed to be used for training, we also provide development and test sets. The development set contains 2500 utterances from 5 speakers and the test set contains 5000 utterances from 10 speakers respectively. Each speaker among the 15 contributed approximately half an hour of his/her own voice, covering 500 prompts. First 7 prompts of all speakers are sampled from a shared prompt pool extracted from high frequency online queries. The gender balance among the sets was concerned and properly covered as well.
+\noindent Aside from AISHELL-2 corpus introduced above, which is supposed to be used for training, 
+we also provide development and test sets. 
+Development set contains 2500 utterances from 5 speakers and test set contains 5000 utterances from 10 speakers. 
+Each speaker contributed approximately half an hour of speech, covering 500 prompts. 
+First 7 prompts of all speakers are extracted from high frequency online queries. Speaker-gender is balanced as well.
 
 \section{AISHELL-2 recipe}
 
