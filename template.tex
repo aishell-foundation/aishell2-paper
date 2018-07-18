@@ -60,21 +60,19 @@ it has begun doing goods for researchers who need high quality Mandarin speech d
 % effort of knowledage transfering from the research topic to application domain
 % is enourmously high, and is normally off the record.
 
-In this paper, we introduce AISHELL-2 corpus and AISHELL-2 recipe, as a complete 
+In this paper, we introduce AISHELL-2 corpus and AISHELL-2 recipe, as a 
 self-contained baseline for industrial-scale Mandarin ASR research. 
-Firstly, AISHELL-2 contains 1000 hours of clean read-speech data, which is free 
-for academic usage. Secondly, an improved speech recognition
-recipe is published, it contains must-have components for Mandarin ASR,
-such as Chinese word segmentation, and a new design for customizable Chinese
-lexicon, etc. Moreover, AISHELL-2 release dev and test data from different acoustic channels(Android and Mic),
-these should be fruitful resources for transfer learning and robust ASR research.
+Firstly, 1000 hours of clean read-speech data(from iOS channel) are released to research community for free.
+Secondly, an ASR recipe is developed, containing must-have components 
+such as Chinese word segmentation, a customizable Chinese lexicon, etc. 
+Moreover, AISHELL-2 contains dev and test data from 3 different acoustic channels(iOS, Android and Mic),
+we hope these resources would be helpful for transfer learning and robust ASR research.
 
-This paper is organized as below. Section 2 introduces the structure and
-specifications of the AISHELL-2 corpus. Section 3 describes the AISHELL-2
-baseline recipe, including data preparation, GMM training, DNN training.
-Section 4 presents baseline system evaluation results.
+This paper is organized as below. Section 2 introduces AISHELL-2 corpus. 
+Section 3 describes AISHELL-2 mandarin ASR baseline system, including data preparation, lexicon, GMM and Neural Network training.
+Section 4 presents system performance on test sets from different acoustic channels.
 
-\section{The AISHELL-2 corpus}
+\section{AISHELL-2 corpus}
 
 The AISHELL-2 corpus contains 1000 hours of clean speech. The raw data was recorded under a multi-channel environment with three devices - a high fidelity microphone, an Android smartphone and an iPhone. The relative position of speaker and devices are shown in Figure~\ref{fig:setup}. The data recorded by the iPhone is the one open-sourced. Speaker, environment and content coverage are fully considered and explained as below:
 \begin{itemize}
@@ -92,16 +90,15 @@ The AISHELL-2 corpus contains 1000 hours of clean speech. The raw data was recor
 
 \noindent Aside from the part of the AISHELL-2 corpus introduced above, which is supposed to be used for training, we also provide development and test sets. The development set contains 2500 utterances from 5 speakers and the test set contains 5000 utterances from 10 speakers respectively. Each speaker among the 15 contributed approximately half an hour of his/her own voice, covering 500 prompts. First 7 prompts of all speakers are sampled from a shared prompt pool extracted from high frequency online queries. The gender balance among the sets was concerned and properly covered as well.
 
-\section{The AISHELL-2 recipe}
+\section{AISHELL-2 recipe}
 
-Based on AISHELL-2 corpus, a baseline Kaldi recipe is developed, including
-data processing, acoustic model and language model
-training, test set evaluation.
+Based on AISHELL-2 corpus, a baseline recipe is released to Kaldi community, including
+data processing, acoustic model and language model training, test set evaluation.
 
 \subsection{Lexicon and word segmentation}
 
-Different from English system, Mandarin ASR systems require word
-segmentation. In AISHELL-1, word segmentation was implemented via forward
+Unlike English ASR system, Mandarin ASR requires word segmentation. 
+In AISHELL-1, word segmentation was implemented via forward
 maximum matching algorithm[Ref], based on a variation of open-source mandarin
 dictionary CC-CEDIT\footnote{https://cc-cedict.org/wiki}. In AISHELL-2, an
 open-source Chinese dictionary called DaCiDian is
@@ -135,17 +132,15 @@ DaCiDian structure is shown in Figure~\ref{fig:lex1} and Figure~\ref{fig:lex2}.
 In terms of word segmentation, we choose a popular and easy-to-use open-source
 toolkit called Jieba~\cite{jieba}, it implements a trie-tree based algorithm and
 supports vocabulary customization.  Base on DaCiDian and Jieba, we provide a
-script to segment AISHELL-2 acoustic data transcription and language model text.
+script to segment AISHELL-2 transcription and language model text.
 
 \subsection{Acoustic model}
 
-Two versions of the acoustic model training pipelines are provided, including
-the GMM training based on maximum likelihood and the hybrid DNN-HMM training
-based on cross entropy.
+Acoustic training contains two stages: HMM-GMM framework based on maximum likelihood and hybrid HMM-DNN
+framework based on state-of-the-art Lattice-Free MMI, i.e. Chain model in Kaldi.
 
-The GMM models are trained using 13 dimensional MFCCs. For sake of real time
-demonstration, pitch is not included as acoustic feature. The training contains
-four steps. A monophone model is trained to set a starting point for the
+The GMM models are trained using 13 dimensional MFCCs.
+A monophone model is trained to set a starting point for the
 triphone models. A small triphone model and a larger triphone model are
 consecutively trained using delta features. After that, a more sophisticated
 feature transform method is applied to replace the delta features. Linear
@@ -154,14 +149,14 @@ dimension and MLLT based global transform is estimated iteratively. This is a
 standard setup in Kaldi recipes. The resulting number of physical GMMs of the
 four steps are 605, 3216, 5720 and 8080 respectively.
 
-GMM training of the AISHELL-2 terminates at the speaker independent stage
+GMM training of the AISHELL-2 stops at the speaker independent stage
 without speaker dependent transform, such as fMLLR. From privacy point of view,
-it is impractical to use customers' personal data and account
+it is impractical to collect customers' personal data and account
 infomation. From architecture point of view, deploying a large scale
 speaker-dependent commercial system is complex and costly. Therefore, AISHELL-2
 adopts speaker independent GMM training. Moreover, it's not worth 
 spending too much time and computation power in GMM stage, since the final system 
-performance primarily depends on later NN models.
+performance primarily depends on later neural network models.
 
 TODO update NN AM topo and training description here
 
@@ -183,15 +178,13 @@ unigrams, 1498603 bigrams and 932475 trigrams.
 \section{Evaluations}
 
 The presented baseline system is trained on a standalone server with ordinary
-configurations. The CPU is Intel Xeon processor of 2.3GHz and the GPUs are four
+configurations. The server is configured with 32 cores of Intel Xeon processor(2.3GHz) and four
 Nvidia Titan Xp. Character Error Rate (CER) is used as evaluation metric. 
 The results along with the total training time of each model are presented in Table~\ref{tab:base}. 
-Note that during training we only use iOS data for acoustic modeling, but we evaluate
+Note that during training we only use open-sourced iOS data, but we evaluate
 these models on dev and test sets for all 3 channels(Android, Mic, and iOS). As
 expected, system performance on iOS outperforms Android and Mic, due to better
 acoustic channel matching between training and testing.
-
-TODO update "improved" recipe result, including results on iOS, Android and Mic
 
 \begin{table*}[th]
   \caption{Baseline system results and training time}
@@ -201,30 +194,30 @@ TODO update "improved" recipe result, including results on iOS, Android and Mic
     \toprule
     CER               &  dev\_android           &  dev\_ios           &  dev\_mic           & test\_android            &  test\_ios           &  test\_mic          &  Training time         \\
     \midrule
-    Monophone        &  47.08                 &  43.37             &  47.33             &  45.40                  &  44.81              &  44.28             &  0.5                   \\
-    Small triphone    &  26.61                 &  22.94             &  26.55             &  26.08                  &  24.79              &  25.36             &  1                     \\
-    Large triphone    &  24.59                 &  21.47             &  24.59             &  23.82                 &  22.69              &  23.37             &  2                     \\
-    LDA+MLLT          &  22.24                 &  18.86             &  22.47             &  21.00                  &  19.77              &  21.10             &  2.3                   \\
+    Mono        &  47.08                 &  43.37             &  47.33             &  45.40                  &  44.81              &  44.28             &  0.5                   \\
+    tri1    &  26.61                 &  22.94             &  26.55             &  26.08                  &  24.79              &  25.36             &  1                     \\
+    tri2    &  24.59                 &  21.47             &  24.59             &  23.82                 &  22.69              &  23.37             &  2                     \\
+    tri3(LDA+MLLT)          &  22.24                 &  18.86             &  22.47             &  21.00                  &  19.77              &  21.10             &  2.3                   \\
     Chain-TDNN              &  10.58                 &  9.01             &  12.37         &  9.68                  &  8.82             &  11.28              &  15                    \\
     \bottomrule
   \end{tabular}
 \end{table*}
 
-\begin{table*}[th]
-  \caption{Transfer learning results}
-  \label{tab:trans}
-  \centering
-  \begin{tabular}{ lllllll }
-    \toprule
-    CER               &  dev\_android           &  dev\_ios           &  dev\_mic           &  test\_android           &  test\_ios           &  test\_mic     \\
-    \midrule
-    Baseline          &  15.04                 &  11.75             &  16.96             &  12.78                  &  11.18              &  14.92        \\
-    Channel transfer  &  12.88                 &  12.16             &  12.13             &  11.65                  &  11.48              &  10.79        \\
-    Domain transfer   &  8.07                  &  6.65              &  9.16              &  6.65                   &  5.63               &  8.05         \\
-    Combined transfer &  6.66                  &  6.43              &  6.21              &  5.97                   &  5.77               &  5.48         \\
-    \bottomrule
-  \end{tabular}
-\end{table*}
+% \begin{table*}[th]
+%  \caption{Transfer learning results}
+%  \label{tab:trans}
+%  \centering
+%  \begin{tabular}{ lllllll }
+%    \toprule
+%    CER               &  dev\_android           &  dev\_ios           &  dev\_mic           &  test\_android           &  test\_ios           &  test\_mic     \\
+%    \midrule
+%    Baseline          &  15.04                 &  11.75             &  16.96             &  12.78                  &  11.18              &  14.92        \\
+%    Channel transfer  &  12.88                 &  12.16             &  12.13             &  11.65                  &  11.48              &  10.79        \\
+%    Domain transfer   &  8.07                  &  6.65              &  9.16              &  6.65                   &  5.63               &  8.05         \\
+%    Combined transfer &  6.66                  &  6.43              &  6.21              &  5.97                   &  5.77               &  5.48         \\
+%    \bottomrule
+%  \end{tabular}
+% \end{table*}
 
 % \section{Customizing a speech recognition system}
 % 
@@ -280,7 +273,7 @@ In this paper, AISHELL-2 Mandarin corpus and AISHELL-2 recipe are released,
 freely available to research community, for building industrial scale research
 baselines. We hope this open-source project may provide essential gradients for
 researchers to explore more scalable techniques regarding to industrial
-issues. 
+issues.
 
 \section{Acknowledgements}
 
