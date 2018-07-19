@@ -142,29 +142,29 @@ script to segment AISHELL-2 transcription and language model text.
 
 \subsection{Acoustic model}
 
-Acoustic training contains two stages: HMM-GMM framework based on maximum likelihood and hybrid HMM-DNN
+Acoustic training contains two stages: GMM-HMM framework based on maximum likelihood and hybrid DNN-HMM
 framework based on state-of-the-art Lattice-Free MMI, i.e. Chain model in Kaldi.
 
-The GMM models are trained using 13 dimensional MFCCs.
+The GMM models are trained using 13 dimensional MFCC plus pitches, which makes the input dimension 16.
 A monophone model is trained to set a starting point for the
 triphone models. A small triphone model and a larger triphone model are
 consecutively trained using delta features. After that, a more sophisticated
 feature transform method is applied to replace the delta features. Linear
 discriminant analysis (LDA) is applied on a stack of frames to reduce the
 dimension and MLLT based global transform is estimated iteratively. This is a
-standard setup in Kaldi recipes. The resulting number of physical GMMs of the
+standard setup in Kaldi recipes. The resulting number of physical GMM states from the
 four steps are 605, 3216, 5720 and 8080 respectively.
 
 GMM training of the AISHELL-2 stops at the speaker independent stage
 without speaker dependent transform, such as fMLLR. From privacy point of view,
 it is impractical to collect customers' personal data and account
-infomation. From architecture point of view, deploying a large scale
+information. From architecture point of view, deploying a large scale
 speaker-dependent commercial system is complex and costly. Therefore, AISHELL-2
 adopts speaker independent GMM training. Moreover, it's not worth 
 spending too much time and computation power in GMM stage, since the final system 
 performance primarily depends on later neural network models.
 
-TODO update NN AM topo and training description here
+Based on the alignments provided by GMM stages above, a time-delayed neural network (TDNN, \cite{tdnn}) with multi-splicing is configured. It has 8 layers in total with 1280 hidden units in each layer. It is, as described in \cite{tdnn}, not fully connected as multi-layer perceptron - the input of each hidden layer is a frame-wise spliced output of its preceding layer. The input feature is high resolution MFCC with cepstral normalization plus pitches, which makes its dimension 43. Note that for each frame-wise input a 100-dimensional i-vector is also attached. This indicates that different from GMM-level training, we encode speaker information here to produce a stronger baseline for research community. The network is trained using lattice-free maximum mutual information (LFMMI, \cite{lfmmi}) as the objective function. More configurations about the DNN training itself can be found at \cite{lfmmi} and the AISHELL-2 example in Kaldi repository \footnote{https://github.com/kaldi-asr/kaldi/egs/aishell2}.
 
 % Neural network acoustic models are trained using 80 dimensional filter bank
 % features. A time-delay neural network (TDNN) with 4 time-delay layers and 2
@@ -177,15 +177,15 @@ TODO update NN AM topo and training description here
 \subsection{Language model}
 
 A trigram language model is trained on 5.7 million words of the training
-scripts. Out-of-vocabulary (OOV) words are mapped into $<$UNK$>$. The language
+scripts. Out-of-vocabulary (OOV) words are mapped as $<$UNK$>$. The language
 model is trained using Kneser-Ney smoothing and the final model has 516552
 unigrams, 1498603 bigrams and 932475 trigrams.
 
 \section{Evaluations}
 
 The presented baseline system is trained on a standalone server with ordinary
-configurations. The server is configured with 32 cores of Intel Xeon processor(2.3GHz) and four
-Nvidia Titan Xp. Character Error Rate (CER) is used as evaluation metric. 
+configurations. The server is configured with 32 cores of Intel Xeon (2.3GHz) and four
+Nvidia Titan Xp processors. Character Error Rate (CER) is used as the evaluation metric. 
 The results along with the total training time of each model are presented in Table~\ref{tab:base}. 
 Note that during training we only use open-sourced iOS data, but we evaluate
 these models on dev and test sets for all 3 channels(Android, Mic, and iOS). As
