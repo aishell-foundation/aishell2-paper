@@ -4,7 +4,7 @@
 \usepackage{subfigure}
 
 \title{AISHELL-2: Transforming Mandarin ASR Research Into Industrial Scale}
-\name{Jiayu Du$^1$, Xuechen Liu$^1$, Hui Bu$^2$}
+\name{Jiayu Du$^1$, Xuechen Liu$^1$, Xingyu Na$^1$, Hui Bu$^2$}
 %The maximum number of authors in the author list is twenty. If the number of contributing authors is more than twenty, they should be listed in a footnote or in acknowledgement section, as appropriate.
 \address{
   $^1$AISHELL foundation$^*$\thanks{* AISHELL foundation is a non-profit online organization, dedicated to pushing forward speech industry via open-sourcing database to research institutes and contributing codes to open-source speech community.} \\
@@ -17,7 +17,7 @@
 %
 \begin{abstract}
 AISHELL-1 is by far the largest open-source speech corpus available for Mandarin
-speech recognition research. It was released with a baseline system containing
+speech recognition research. It was released with a baseline system containing solid
 training and testing pipelines for Mandarin ASR. In AISHELL-2, 1000 hours of
 clean read-speech data from iOS is published, which is free for academic usage. On top of
 AISHELL-2 corpus, an improved recipe is developed and released, containing key
@@ -142,29 +142,14 @@ script to segment AISHELL-2 transcription and language model text.
 
 \subsection{Acoustic model}
 
-Acoustic training contains two stages: GMM-HMM framework based on maximum likelihood and hybrid DNN-HMM
-framework based on state-of-the-art Lattice-Free MMI, i.e. Chain model in Kaldi.
+Acoustic training contains two stages: GMM-HMM state model training based on maximum likelihood and later the training of a hybrid DNN-HMM state estimator. Both can be trained using standard methods and recipes from Kaldi.
 
 The GMM models are trained using 13 dimensional MFCC plus pitches, which makes the input dimension 16.
-A monophone model is trained to set a starting point for the
-triphone models. A small triphone model and a larger triphone model are
-consecutively trained using delta features. After that, a more sophisticated
-feature transform method is applied to replace the delta features. Linear
-discriminant analysis (LDA) is applied on a stack of frames to reduce the
-dimension and MLLT based global transform is estimated iteratively. This is a
-standard setup in Kaldi recipes. The resulting number of physical GMM states from the
-four steps are 605, 3216, 5720 and 8080 respectively.
+A monophone model is trained to set a starting point for the triphone models. A small triphone model and a larger triphone model are consecutively trained using delta features. After that, a more sophisticated feature transform method is applied to replace the delta features. Linear discriminant analysis (LDA) is applied on stack of frames to reduce the dimension and MLLT-based global transform is estimated iteratively. This is a standard setup in Kaldi recipes. The resulting number of physical GMM states from the four steps are 605, 3216, 5720 and 8080 respectively.
 
-GMM training of the AISHELL-2 stops at the speaker independent stage
-without speaker dependent transform, such as fMLLR. From privacy point of view,
-it is impractical to collect customers' personal data and account
-information. From architecture point of view, deploying a large scale
-speaker-dependent commercial system is complex and costly. Therefore, AISHELL-2
-adopts speaker independent GMM training. Moreover, it's not worth 
-spending too much time and computation power in GMM stage, since the final system 
-performance primarily depends on later neural network models.
+GMM training of the AISHELL-2 stops at the speaker independent stage without speaker dependent transform involved, such as fMLLR. This is because from architecture point of view, deploying a GMM-based large scale speaker-dependent commercial system may be complex and costly. Also it may not worth spending too much time and computation power in GMM stage, since the final system  performance primarily depends on later neural network models. Therefore, AISHELL-2 adopts speaker independent GMM training and push the speaker dependent steps to later DNN training phase, as described below.
 
-Based on the alignments provided by GMM stages above, a time-delayed neural network (TDNN, \cite{tdnn}) with multi-splicing is configured. It has 8 layers in total with 1280 hidden units in each layer. It is, as described in \cite{tdnn}, not fully connected as multi-layer perceptron - the input of each hidden layer is a frame-wise spliced output of its preceding layer. The input feature is high resolution MFCC with cepstral normalization plus pitches, which makes its dimension 43. Note that for each frame-wise input a 100-dimensional i-vector is also attached. This indicates that different from GMM-level training, we encode speaker information here to produce a stronger baseline for research community. The network is trained using lattice-free maximum mutual information (LFMMI, \cite{lfmmi}) as the objective function. More configurations about the DNN training itself can be found at \cite{lfmmi} and the AISHELL-2 example in Kaldi repository \footnote{https://github.com/kaldi-asr/kaldi/egs/aishell2}.
+Based on the alignments provided by GMM stages above, a time-delayed neural network (TDNN, \cite{tdnn}). It has 8 layers in total with 1280 hidden units in each layer. It is, as described in \cite{tdnn}, not fully connected as multi-layer perceptron - the input of each hidden layer is a frame-wise spliced output of its preceding layer. The input feature is high resolution MFCC with cepstral normalization plus pitches, which makes its dimension 43. Note that for each frame-wise input a 100-dimensional i-vector is also attached. This indicates that different from GMM-level training, we encode speaker information here to produce a stronger baseline for research community. The network is trained using lattice-free maximum mutual information (LFMMI, \cite{lfmmi}) as the objective function. More configurations about the DNN training itself can be found at \cite{lfmmi} and AISHELL-2 exemplar scripts in Kaldi repository \footnote{https://github.com/kaldi-asr/kaldi/egs/aishell2}.
 
 % Neural network acoustic models are trained using 80 dimensional filter bank
 % features. A time-delay neural network (TDNN) with 4 time-delay layers and 2
@@ -176,10 +161,7 @@ Based on the alignments provided by GMM stages above, a time-delayed neural netw
 
 \subsection{Language model}
 
-A trigram language model is trained on 5.7 million words of the training
-scripts. Out-of-vocabulary (OOV) words are mapped as $<$UNK$>$. The language
-model is trained using Kneser-Ney smoothing and the final model has 516552
-unigrams, 1498603 bigrams and 932475 trigrams.
+A trigram language model is trained on a 5.7 million-word database. Out-of-vocabulary (OOV) words are mapped as $<$UNK$>$. The 3-order language model is trained using Kneser-Ney smoothing and the final model has 516552 unigrams, 1498603 bigrams and 932475 trigrams.
 
 \section{Evaluations}
 
@@ -276,15 +258,13 @@ acoustic channel matching between training and testing.
 \section{Conclusions}
 
 In this paper, AISHELL-2 Mandarin corpus and AISHELL-2 recipe are released,
-freely available to research community, for building industrial scale research
+freely available to research community for building industrial scale research
 baselines. We hope this open-source project may provide essential gradients for
-researchers to explore more scalable techniques regarding to industrial
-issues.
+researchers to explore more scalable techniques regarding to industrial issues in the field of Chinese Speech Recognition.
 
 \section{Acknowledgements}
 
-The authors thank all members of AISHELL foundation who contributed to this
-project and Emotech Labs who provided computational resources for producing most recent system performance statistics.
+The authors thank all members of AISHELL foundation who contributed to this project and Emotech Labs who provided computational resources for producing most recent system performance statistics.
 
 \bibliographystyle{IEEEtran}
 
