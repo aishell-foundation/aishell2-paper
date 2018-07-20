@@ -4,7 +4,7 @@
 \usepackage{subfigure}
 
 \title{AISHELL-2: Transforming Mandarin ASR Research Into Industrial Scale}
-\name{Jiayu Du$^1$, Xuechen Liu$^1$, Xingyu Na$^1$, Hui Bu$^2$}
+\name{Jiayu Du$^1$, Xingyu Na$^1$, Xuechen Liu$^1$, Hui Bu$^2$}
 %The maximum number of authors in the author list is twenty. If the number of contributing authors is more than twenty, they should be listed in a footnote or in acknowledgement section, as appropriate.
 \address{
   $^1$AISHELL foundation$^*$\thanks{* AISHELL foundation is a non-profit online organization, dedicated to pushing forward speech industry via open-sourcing database to research institutes and contributing codes to open-source speech community.} \\
@@ -76,10 +76,10 @@ Section 4 presents system performance on test sets from different acoustic chann
 
 \section{AISHELL-2 corpus}
 
-AISHELL-2 corpus contains 1000 hours of clean speech. Raw data was recorded under a multi-channel environment with three devices - a high fidelity microphone, an Android smartphone and an iPhone. The relative position of speaker and devices are shown in Figure~\ref{fig:setup}. The data recorded by the iPhone is the one open-sourced. Speaker, environment and content coverage are fully considered and explained as below:
+AISHELL-2 corpus contains 1000 hours of clean speech. Raw data was recorded via three parallel acoustic channels - a high fidelity microphone(Mic), an Android smartphone(Android) and an iPhone(iOS). The relative position between speaker and devices are shown in Figure~\ref{fig:setup}. Data from iPhone is open-sourced to research community. Speaker, environment and content coverage are explained as below:
 \begin{itemize}
-\item There are 1991 speakers participated in the recording, including 845 male speakers and 1146 female speakers. Age of speaker ranges from 11 to over 40. Ideally the speakers shall speak everything to be recorded in Mandarin, while there are some slight accent variations. Generally speaking of the accents, there were 1293 speakers using Northern ones, 678 speakers using Southern ones and 20 speakers use other accents during recording. 
-\item 1347 speakers got themselves recorded in a studio while the rest were in a living room with natural reverberation.
+\item There are 1991 speakers participated in the recording, including 845 male and 1146 female. Age of speaker ranges from 11 to over 40. Ideally the speakers shall speak everything to be recorded in Mandarin, while there are some slight accent variations. Generally speaking of the accents, there were 1293 speakers using Northern ones, 678 speakers using Southern ones and 20 speakers use other accents during recording. 
+\item 1347 speakers are recorded in a studio, while the rest are in a living room with natural reverberation.
 \item The content of the recording covers 8 major topics: voice commands such as IoT device control and digital sequential input, places of interest, entertainment, finance, technology, sports, English spellings and free speaking without specific topic. The total number of prompts is around half a million.
 \end{itemize}
 
@@ -165,10 +165,9 @@ A trigram language model is trained on a 5.7 million-word database. Out-of-vocab
 
 \section{Evaluations}
 
-The presented baseline system is trained on a standalone server with ordinary
-configurations. The server is configured with 32 cores of Intel Xeon (2.3GHz) and four
+The presented baseline system is trained on a standalone server, with 32 cores of Intel Xeon (2.3GHz) and 4
 Nvidia Titan Xp processors. Character Error Rate (CER) is used as the evaluation metric. 
-The results along with the total training time of each model are presented in Table~\ref{tab:base}. 
+The results along with the total training time of each stage are presented in Table~\ref{tab:base}. 
 Note that during training we only use open-sourced iOS data, but we evaluate
 these models on dev and test sets for all 3 channels(Android, Mic, and iOS). As
 expected, system performance on iOS outperforms Android and Mic, due to better
@@ -259,8 +258,8 @@ acoustic channel matching between training and testing.
 
 In this paper, AISHELL-2 Mandarin corpus and AISHELL-2 recipe are released,
 freely available to research community for building industrial scale research
-baselines. We hope this open-source project may provide essential gradients for
-researchers to explore more scalable techniques regarding to industrial issues in the field of Chinese Speech Recognition.
+baselines. We hope this open-source project may provide essential ingradients for
+researchers to explore more scalable techniques regarding to industrial issues in the field of Mandarin speech recognition.
 
 \section{Acknowledgements}
 
