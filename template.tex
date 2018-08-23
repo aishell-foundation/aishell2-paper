@@ -36,22 +36,22 @@ building meaningful industrial systems and products.
 \section{Introduction}
 
 Automatic Speech Recognition (ASR) is one of the application domains in the bloom of Artificial
-Intelligence (AI) which recently received huge attention. Huge effort has been made in both research and industry
-to improve ASR system performance. Among all solutions, Deep Learning has been dominating
-this field in the recent half decade. One advantage offered by it is that neural network (NN) models generally turn out to be more robust when
-huge amount of data is provided. This is good since thanks to the emerging market of various smart devices with rising online network usage, real data from
+Intelligence (AI) which recently received huge attention. Huge effort has been made from both research community and industry
+to improve ASR system performance. Among all solutions proposed, ones based on Deep Learning and its generations has been dominating
+in the recent half decade. One advantage offered by it is that neural network (NN) models generally turn out to be more robust when
+huge amount of data is provided. This is good since thanks to the emerging market of various smart devices with rising online network usage, data from
 real-time scenarios can sometimes be fetched consistently. Therefore, accessing and 
-collecting data has become easier than before for software industry.
+collecting data in a proper fashion has become easier than before, especially from industrial perpective.
 However, on the other hand, research community still normally has limited access to real-world
-application data. Number of ASR solutions, as a result, mostly can not scale well and hence not applicable for industrial use. This leads to the need of high-quality corpus for research use while being easily deployable to industrial level, just like what happened in the field of computer vision (e.g. ImageNet~\cite{imagenet} and COCO~\cite{coco}). No such corpus in Mandarin ASR has been released until AISHELL-1~\cite{aishell1}.
+application data. Most ASR solutions, as a result, can not scale well in real-time practice and hence not applicable for industrial use. This leads to the need of open-sourced high-quality corpus for mostly research use while being easily deployable to industrial level, just like what happened in the field of computer vision (e.g. ImageNet~\cite{imagenet} and COCO~\cite{coco}). Although there are corpus like thchs30~\cite{thchs30} and hkust~\cite{hkust1}, no such corpus in Mandarin ASR which can meets all those requirements above has been released until AISHELL-1~\cite{aishell1}.
 %In the field of computer vision, there are many high quality free data sets which transform many research
 %efforts into industrial applications, such as ImageNet~\cite{imagenet} and
 %COCO~\cite{coco}. However, in the field of Mandarin ASR, there was no free
 %corpus with sufficient amount of high quality speech data to build a meaningful
 %research baseline, until the release of AISHELL-1~\cite{aishell1}.
 It contains 170 hours of Mandarin speech with high quality human transcriptions. 
-Various training and evaluation recipes based on such corpus have been released on Kaldi~\cite{kaldi}, 
-which is a large and robust framework for speech research. 
+Various training and evaluation recipes based on such corpus have been developed and released in Kaldi~\cite{kaldi}, 
+which is a robust and widely-acknowledged framework for speech research. 
 To the best knowledge of the authors, it is the first fully open-sourced system for Mandarin ASR with 
 high quality Mandarin speech data(e.g. ~\cite{do2017, do2018_1, do2018_2}).
 
@@ -63,38 +63,38 @@ high quality Mandarin speech data(e.g. ~\cite{do2017, do2018_1, do2018_2}).
 % effort of knowledage transfering from the research topic to application domain
 % is enourmously high, and is normally off the record.
 
-In this paper, we introduce AISHELL-2, as a self-contained baseline for industrial-scale Mandarin ASR research. 
-Firstly, 1000 hours of clean read-speech data(from iOS channel) are released to research community for free.
-Secondly, an ASR recipe is developed, containing must-have components such as Chinese word segmentation, 
-customizable Chinese lexicon, etc. 
-Moreover, AISHELL-2 releases dev and test data from 3 different acoustic channels(iOS, Android and Mic),
-we hope these resources would be helpful for transfer learning and robust ASR research.
+Furthering the success from AISHELL-1 with efforts, in this paper, we introduce AISHELL-2, as an open-sourced while self-contained baseline for industrial-scale Mandarin ASR research. 
+Several recipes along with the corpus has been developed, containing must-have components such as Chinese word segmentation, 
+customizable Chinese lexicon etc, following what have been done with AISHELL-1 formally.
+Moreover, following the training data, development and test data from 3 different acoustic channels(iOS, Android and Mic) are released and open-sourced as well.
+We hope these resources would be helpful for Mandarin ASR research, making it get closer with industrial-scale level.
 
-This paper is organized as below. Section 2 introduces AISHELL-2 corpus. 
-Section 3 describes AISHELL-2 mandarin ASR baseline, including data preparation, lexicon, GMM and Neural Network training.
+The rest of this paper is organized as following: The details of AISHELL-2 corpus data is introduced in Section 2.
+Section 3 describes the Mandarin ASR pipeline for producing baseline system, including data preparation, lexicon, Gaussian mixture model (GMM) and Neural Network training.
 Section 4 presents system performance on test sets from different acoustic channels.
 
 \section{AISHELL-2 corpus}
 
-AISHELL-2 corpus contains 1000 hours of clean speech. Raw data was recorded via three parallel acoustic channels - a high fidelity microphone(Mic), an Android smartphone(Android) and an iPhone(iOS). The relative position between speaker and devices are shown in Figure~\ref{fig:setup}. Data from iPhone is open-sourced to research community. Speaker, environment and content coverage are explained as below:
+AISHELL-2 corpus contains 1000 hours of clean read-speech data, which will be released to academic research community for free. Raw data was recorded via three parallel acoustic channels - a high fidelity microphone (Mic), an Android smartphone (Android) and an iPhone (iOS). The relative position between speaker and devices are shown in Figure~\ref{fig:setup}. Data from iPhone, i.e. the iOS channel is open-sourced. Speaker, environment and content coverage are explained as below:
 \begin{itemize}
-\item There are 1991 speakers participated in the recording, including 845 male and 1146 female. Age of speaker ranges from 11 to over 40. Ideally the speakers shall speak everything to be recorded in Mandarin, while there are some slight accent variations. Generally speaking of the accents, there were 1293 speakers using Northern ones, 678 speakers using Southern ones and 20 speakers use other accents during recording. 
-\item 1347 speakers are recorded in a studio, while the rest are in a living room with natural reverberation.
-\item The content of the recording covers 8 major topics: voice commands such as IoT device control and digital sequential input, places of interest, entertainment, finance, technology, sports, English spellings and free speaking without specific topic. The total number of prompts is around half a million.
+\item \textbf{Speaker information.} There are 1991 speakers participated in the recording, including 845 male and 1146 female. Age of speaker ranges from 11 to over 40. Ideally the speakers shall speak everything to be recorded in Mandarin, while there are some slight accent variations. Generally speaking of the accents, there were 1293 speakers using Northern ones, 678 speakers using Southern ones and 20 speakers use other accents during recording. 
+\item \textbf{Recording environment.} 1347 speakers are recorded in a studio, while the rest are in a living room with natural reverberation.
+\item \textbf{Content of speech}. The content of the recording covers 8 major topics: voice commands such as IoT device control and digital sequential input, places of interest, entertainment, finance, technology, sports, English spellings and free speaking without specific topic. The total number of prompts is around half a million.
 \end{itemize}
-
-\begin{figure}[t]
-  \centering
-  \includegraphics[width=\linewidth]{setup.jpg}
-  \caption{Recording setup}
-  \label{fig:setup}
-\end{figure}
 
 \noindent Aside from AISHELL-2 corpus introduced above, which is supposed to be used for training, 
 we also provide development and test sets. 
 Development set contains 2500 utterances from 5 speakers and test set contains 5000 utterances from 10 speakers. 
 Each speaker contributed approximately half an hour of speech, covering 500 prompts. 
 First 7 prompts of all speakers are extracted from high frequency online queries. Speaker-gender is balanced as well.
+
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=\linewidth]{setup.jpg}
+  \caption{Recording setup}
+  \label{fig:setup}
+\end{figure}
 
 \section{AISHELL-2 recipe}
 
@@ -103,24 +103,19 @@ data processing, acoustic model and language model training, test set evaluation
 
 \subsection{Lexicon and word segmentation}
 
-Unlike English ASR system, Mandarin ASR requires word segmentation. 
+Unlike English ASR system, Mandarin ASR often requires sophisticated word segmentation. 
 In AISHELL-1, word segmentation was implemented via forward
-maximum matching algorithm[Ref], based on a variation of open-source mandarin
+maximum matching algorithm \textbf{[Ref?]}, based on a variation of open-source mandarin
 dictionary CC-CEDIT\footnote{https://cc-cedict.org/wiki}. In AISHELL-2, an
 open-source Chinese dictionary called DaCiDian is
 released\footnote{https://github.com/aishell-foundation/DaCiDian}. In most
 common Chinese dictionaries, words are directly mapped to phonemes. While in
-DaCiDian, this mapping is decomposed into 2 independent layers. An examplar
-DaCiDian structure is shown in Figure~\ref{fig:lex1} and Figure~\ref{fig:lex2}.
-
-\begin{itemize}
-\item The first layer maps word to PinYin syllables~\cite{pinyin}. Anyone who is
-  familiar with PinYin (basically every Mandarin speaker), can enrich DaCiDian's
-  vocabulary by adding new words into this layer.
-\item The second layer is a mapping from Pinyin syllable to phoneme. ASR system
+DaCiDian, this mapping is decomposed into 2 independent layers. An exemplar
+DaCiDian structure is shown in Figure~\ref{fig:lex1} and Figure~\ref{fig:lex2}. The first layer maps word to PinYin syllables~\cite{pinyin}. Anyone who is
+  familiar with PinYin (basically every Mandarin speaker) can enrich DaCiDian's
+  vocabulary by adding new words into this layer. The second layer is a mapping from Pinyin syllable to phoneme. ASR system
   developers can easily adapt DaCiDian to their own phone set by redefining this
   layer of mapping.
-\end{itemize}
 
 \begin{figure}[t]
   \centering
@@ -263,7 +258,7 @@ researchers to explore more scalable techniques regarding to industrial issues i
 
 \section{Acknowledgements}
 
-The authors thank all members of AISHELL foundation who contributed to this project and Emotech Labs who provided computational resources for producing most recent system performance statistics.
+The authors would like to thank all other members of AISHELL foundation who contributed to this project and Emotech Labs who provided computational resources for producing most recent system performance statistics.
 
 \bibliographystyle{IEEEtran}
 
