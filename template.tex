@@ -69,9 +69,7 @@ customizable Chinese lexicon etc, following what have been done with AISHELL-1 f
 Moreover, following the training data, development and test data from 3 different acoustic channels(iOS, Android and Mic) are released and open-sourced as well.
 We hope these resources would be helpful for Mandarin ASR research, making it get closer with industrial-scale level.
 
-The rest of this paper is organized as following: The details of AISHELL-2 corpus data is introduced in Section 2.
-Section 3 describes the Mandarin ASR pipeline for producing baseline system, including data preparation, lexicon, Gaussian mixture model (GMM) and Neural Network training.
-Section 4 presents system performance on test sets from different acoustic channels.
+The rest of this paper is organized as following: The details of AISHELL-2 corpus data is introduced in Section 2. Section 3 describes the Mandarin ASR pipeline for producing baseline system and Section 4 presents system performance on test sets from different acoustic channels.
 
 \section{AISHELL-2 corpus}
 
@@ -88,7 +86,6 @@ Development set contains 2500 utterances from 5 speakers and test set contains 5
 Each speaker contributed approximately half an hour of speech, covering 500 prompts. 
 First 7 prompts of all speakers are extracted from high frequency online queries. Speaker-gender is balanced as well.
 
-
 \begin{figure}[h]
   \centering
   \includegraphics[width=\linewidth]{setup.jpg}
@@ -98,8 +95,7 @@ First 7 prompts of all speakers are extracted from high frequency online queries
 
 \section{AISHELL-2 recipe}
 
-Based on AISHELL-2 corpus, a baseline recipe is released to Kaldi community, including
-data processing, acoustic model and language model training, test set evaluation.
+As briefly mentioned in Section 1, based on AISHELL-2 corpus, several recipes are released to Kaldi repository as a complete collection, including data and lexicon preparation, language model training, Gaussian mixture model (GMM) and Neural Network training, as well as test set evaluation procedure.
 
 \subsection{Lexicon and word segmentation}
 
@@ -144,29 +140,20 @@ A monophone model is trained to set a starting point for the triphone models. A 
 
 GMM training of the AISHELL-2 stops at the speaker independent stage without speaker dependent transform involved, such as fMLLR. For industrial-scale corpus, it is not worth spending too much time and computation power in GMM stage, since the final system performance primarily depends on later neural network models. Therefore, AISHELL-2 adopts speaker independent GMM training and push the speaker dependent steps to later DNN training phase, as described below.
 
-Based on the alignments provided by GMM stages above, a time-delayed neural network (TDNN, \cite{tdnn}). It has 8 layers in total with 1280 hidden units in each layer. It is, as described in \cite{tdnn}, not fully connected as multi-layer perceptron - the input of each hidden layer is a frame-wise spliced output of its preceding layer. The input feature is high resolution MFCC with cepstral normalization plus pitches, which makes its dimension 43. Note that for each frame-wise input a 100-dimensional i-vector is also attached. This indicates that different from GMM-level training, we encode speaker information here to produce a stronger baseline for research community. The network is trained using lattice-free maximum mutual information (LFMMI, \cite{lfmmi}) as the objective function. More configurations about the DNN training itself can be found at \cite{lfmmi} and AISHELL-2 exemplar scripts in Kaldi repository \footnote{https://github.com/kaldi-asr/kaldi/egs/aishell2}.
-
-% Neural network acoustic models are trained using 80 dimensional filter bank
-% features. A time-delay neural network (TDNN) with 4 time-delay layers and 2
-% full-connect layers is trained using batch normalization~\cite{tdnn}. All of the
-% layers use 850 output RELU neurons~\cite{relu}. A recurrent neural network with
-% 3 LSTM layers is trained using chunked BPTT with a output delay factor of
-% 5~\cite{lstm}. Each of the LSTM layers contains 1024 cells and a projection of
-% 256 output neurons~\cite{lstmp}.
+Based on the alignments provided by GMM stages above, a time-delayed neural network (TDNN, \cite{tdnn}). It has 8 layers in total with 1280 hidden units in each layer. It is, as described in \cite{tdnn}, not fully connected as multi-layer perceptron - the input of each hidden layer is a frame-wise spliced output of its preceding layer. The input feature is high resolution MFCC with cepstral normalization plus pitches, which makes its dimension 43. Note that for each frame-wise input a 100-dimensional i-vector~\cite{ivector} is also attached, whose extractor is trained based on the corpus itself. The corresponding diagonal universal background model (UBM) is trained using a quarter of training features. This indicates that different from GMM-level training, we encode speaker information here to produce a stronger baseline for research community. The network is trained using lattice-free maximum mutual information (LFMMI, \cite{lfmmi}) as the objective function. More configurations about NN training itself such as lattice generation and tree topology can be found at \cite{lfmmi} and AISHELL-2 exemplar scripts in Kaldi repository \footnote{https://github.com/kaldi-asr/kaldi/egs/aishell2}.
 
 \subsection{Language model}
 
-A trigram language model is trained on a 5.7 million-word database. Out-of-vocabulary (OOV) words are mapped as $<$UNK$>$. The 3-order language model is trained using Kneser-Ney smoothing and the final model has 516552 unigrams, 1498603 bigrams and 932475 trigrams.
+A trigram language model is trained on a 5.7 million-word database. Out-of-vocabulary (OOV) words are mapped as $<$UNK$>$. The 3-order ARPA language model is trained using Kneser-Ney smoothing. The final model has 516552 unigrams, 1498603 bigrams and 932475 trigrams.
 
-\section{Evaluations}
+\section{Experiment and evaluations}
 
-The presented baseline system is trained on a standalone server, with 36 cores of Intel Xeon (2.3GHz) for all cpu-based steps and 4
-Tesla K80 processors for DNN model training. Character Error Rate (CER) is used as the evaluation metric. 
-The results along with the total training time of each stage are presented in Table~\ref{tab:base}. 
-Note that during training we only use open-sourced iOS data, but we evaluate
-these models on dev and test sets for all 3 channels (Android, Mic, and iOS). As
-expected, system performance on iOS outperforms Android and Mic, due to better
-acoustic channel matching between training and testing.
+Speaking of hardware, the presented baseline system is trained on a standalone server, with 36 cores of Intel Xeon (2.3GHz) for all cpu-based steps and 4
+Tesla K80 processors for DNN model training. Character Error Rate (CER) was used as the evaluation metric. 
+
+Results along with the total training time of each stage, which was counted in unit of hours, are presented in Table~\ref{tab:base}. 
+Note that as to keep consistency with future community usage, during training we only use open-sourced iOS data from the beginning to the end, but we evaluate
+these models on dev and test sets for all 3 channels (Android, Mic, and iOS). System performance on iOS outperforms Android and Mic, which is as expected due to better acoustic channel condition matching.
 
 \begin{table*}[th]
   \caption{Baseline system results and training time}
@@ -251,10 +238,7 @@ acoustic channel matching between training and testing.
 
 \section{Conclusions}
 
-In this paper, AISHELL-2 Mandarin corpus and AISHELL-2 recipe are released,
-freely available to research community for building industrial scale research
-baselines. We hope this open-source project may provide essential ingradients for
-researchers to explore more scalable techniques regarding to industrial issues in the field of Mandarin speech recognition.
+In this paper, we generally introduce AISHELL-2, a 1000 hour Mandarin ASR corpus which is freely available to research community for building industrial scale speech solutions, as well as its following utilities and some details about the pipeline for baseline results. We hope this open-source project is able to provide essential ingredients for researchers to explore more scalable and practical solutions regarding to industrial issues in the field of Mandarin speech recognition and will keep improving it from every aspect.
 
 \section{Acknowledgements}
 
