@@ -165,11 +165,11 @@ A trigram language model is trained on a 5.7 million-word database. Out-of-vocab
 
 \section{Evaluations}
 
-The presented baseline system is trained on a standalone server, with 32 cores of Intel Xeon (2.3GHz) and 4
+The presented baseline system is trained on a standalone server, with 36 cores of Intel Xeon (2.3GHz) and 8
 Nvidia Titan Xp processors. Character Error Rate (CER) is used as the evaluation metric. 
 The results along with the total training time of each stage are presented in Table~\ref{tab:base}. 
 Note that during training we only use open-sourced iOS data, but we evaluate
-these models on dev and test sets for all 3 channels(Android, Mic, and iOS). As
+these models on dev and test sets for all 3 channels (Android, Mic, and iOS). As
 expected, system performance on iOS outperforms Android and Mic, due to better
 acoustic channel matching between training and testing.
 
@@ -184,7 +184,7 @@ acoustic channel matching between training and testing.
     Mono        &  47.08                 &  43.37             &  47.33             &  45.40                  &  44.81              &  44.28             &  0.5                   \\
     tri1    &  26.61                 &  22.94             &  26.55             &  26.08                  &  24.79              &  25.36             &  1                     \\
     tri2    &  24.59                 &  21.47             &  24.59             &  23.82                 &  22.69              &  23.37             &  2                     \\
-    tri3(LDA+MLLT)          &  22.24                 &  18.86             &  22.47             &  21.00                  &  19.77              &  21.10             &  2.3                   \\
+    tri3(LDA+MLLT)          &  22.24                 &  18.86             &  22.47             &  21.00                  &  19.77              &  21.10             &  2.5                   \\
     Chain-TDNN              &  10.58                 &  9.01             &  12.37         &  9.68                  &  8.82             &  11.28              &  15                    \\
     \bottomrule
   \end{tabular}
