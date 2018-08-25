@@ -35,41 +35,34 @@ building meaningful industrial systems and products.
 
 \section{Introduction}
 
-Automatic Speech Recognition (ASR) is one of the application domains in the bloom of Artificial
-Intelligence (AI) which recently received huge attention. Huge effort has been made from both research community and industry
-to improve ASR system performance. Among all solutions proposed, ones based on Deep Learning and its generations has been dominating
-in the recent half decade. One advantage offered by it is that neural network (NN) models generally turn out to be more robust when
-huge amount of data is provided. This is good since thanks to the emerging market of various smart devices with rising online network usage, data from
-real-time scenarios can sometimes be fetched consistently. Therefore, accessing and 
-collecting data in a proper fashion has become easier than before, especially from industrial perpective.
-However, on the other hand, research community still normally has limited access to real-world
-application data. Most ASR solutions, as a result, can not scale well in real-time practice and hence not applicable for industrial use. This leads to the need of open-sourced high-quality corpus for mostly research use while being easily deployable to industrial level, just like what happened in the field of computer vision (e.g. ImageNet~\cite{imagenet} and COCO~\cite{coco}). Although there are corpus like thchs30~\cite{thchs30} and hkust~\cite{hkust1}, no such corpus in Mandarin ASR which can meets all those requirements above has been released until AISHELL-1~\cite{aishell1}.
-%In the field of computer vision, there are many high quality free data sets which transform many research
-%efforts into industrial applications, such as ImageNet~\cite{imagenet} and
-%COCO~\cite{coco}. However, in the field of Mandarin ASR, there was no free
-%corpus with sufficient amount of high quality speech data to build a meaningful
-%research baseline, until the release of AISHELL-1~\cite{aishell1}.
-It contains 170 hours of Mandarin speech with high quality human transcriptions. 
-Various training and evaluation recipes based on such corpus have been developed and released in Kaldi~\cite{kaldi}, 
+Automatic Speech Recognition (ASR) is a major application domain in the bloom of Artificial
+Intelligence (AI). Huge effort has been made from both research community and industry
+to improve ASR system performance. Among all solutions proposed, deep learning approach has been dominating
+for the last half decade. Given enough data, neural network (NN) models generally perform better in terms of recognition accuracy, and turn out to be more robust.
+From industrial perspective, accessing and collecting large amount of speech data has become easier than ever before, with emerging market of smart phones and various other smart devices.
+However, on the other hand, research community still has limited-access to real-world
+application data. As a result, improvements in research community do not always scale well to industrial scenarios. 
+In computer vision, there are many high quality free data sets which transform research
+efforts into industrial applications, such as ImageNet~\cite{imagenet} and COCO~\cite{coco}. 
+In Mandarin ASR, although there are corpus like thchs30~\cite{thchs30} and hkust~\cite{hkust1}, 
+a large-scale high-quality free corpus is still needed.
+
+In AISHELL-1~\cite{aishell1}, we released 170 hours of Mandarin speech with high quality human transcriptions. 
+Various training and evaluation recipes based on such corpus have been developed in Kaldi~\cite{kaldi}, 
 which is a robust and widely-acknowledged framework for speech research. 
 To the best knowledge of the authors, it is the first fully open-sourced system for Mandarin ASR with 
 high quality Mandarin speech data(e.g. ~\cite{do2017, do2018_1, do2018_2}).
 
-% Another issue with the Mandarin speech recognition research is that, there is
-% still gap between a research prototype for demonstration and a working system
-% for application. The open-source movement improves the transparency and
-% availability of many research achievements. However, the attemp of direct
-% deployment of a working system from an open-source demostration often fail. The
-% effort of knowledage transfering from the research topic to application domain
-% is enourmously high, and is normally off the record.
+Furthering the success from AISHELL-1 with efforts, in this paper, we introduce AISHELL-2, 
+an open-sourced, self-contained baseline for industrial-scale Mandarin ASR research. 
+On one hand, 1000 hours of iPhone-recorded speech data is released. On the other hand, baseline recipes(containing must-have components such as Chinese word segmentation, 
+customizable Chinese lexicon etc) are published into Kaldi, following what have been done with AISHELL-1 formally.
+Moreover, besides training data(iOS), we release development and test data from 3 acoustic channels(iOS, Android and Mic).
+We hope these resources would be helpful to transform Mandarin ASR research into industrial scale.
 
-Furthering the success from AISHELL-1 with efforts, in this paper, we introduce AISHELL-2, as an open-sourced while self-contained baseline for industrial-scale Mandarin ASR research. 
-Several recipes along with the corpus has been developed, containing must-have components such as Chinese word segmentation, 
-customizable Chinese lexicon etc, following what have been done with AISHELL-1 formally.
-Moreover, following the training data, development and test data from 3 different acoustic channels(iOS, Android and Mic) are released and open-sourced as well.
-We hope these resources would be helpful for Mandarin ASR research, making it get closer with industrial-scale level.
-
-The rest of this paper is organized as following: The details of AISHELL-2 corpus data is introduced in Section 2. Section 3 describes the Mandarin ASR pipeline for producing baseline system and Section 4 presents system performance on test sets from different acoustic channels.
+The rest of this paper is organized as follows: The details of AISHELL-2 corpus data is introduced in Section 2. 
+Section 3 describes the Mandarin ASR pipeline for producing baseline system and Section 4 
+presents system performance on test sets from different acoustic channels.
 
 \section{AISHELL-2 corpus}
 
