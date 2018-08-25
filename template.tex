@@ -36,27 +36,18 @@ building meaningful industrial systems and products.
 \section{Introduction}
 
 Automatic Speech Recognition (ASR) is a major application domain in the bloom of Artificial
-Intelligence (AI). Huge effort has been made from both research community and industry
-to improve ASR system performance. Among all solutions proposed, deep learning approach has been dominating
-for the last half decade. Given enough data, neural network (NN) models generally perform better in terms of recognition accuracy, and turn out to be more robust.
+Intelligence (AI). Huge effort has been made from both research community and industry to improve ASR system performance. Among all solutions proposed, deep learning approach has been dominating for the last half decade. Given enough data, neural network (NN) models generally perform better in terms of recognition accuracy, and turn out to be more robust.
 From industrial perspective, accessing and collecting large amount of speech data has become easier than ever before, with emerging market of smart phones and various other smart devices.
-However, on the other hand, research community still has limited-access to real-world
-application data. As a result, improvements in research community do not always scale well to industrial scenarios. 
-In computer vision, there are many high quality free data sets which transform research
-efforts into industrial applications, such as ImageNet~\cite{imagenet} and COCO~\cite{coco}. 
-In Mandarin ASR, although there are corpus like thchs30~\cite{thchs30} and hkust~\cite{hkust1}, 
-a large-scale high-quality free corpus is still needed.
+However, on the other hand, research community still has limited-access to real-world application data. As a result, improvements in research community do not always scale well to industrial scenarios. 
+In computer vision, there are many high quality free data sets which transform research efforts into industrial applications, such as ImageNet~\cite{imagenet} and COCO~\cite{coco}. 
+In Mandarin ASR, although there are corpus like thchs30~\cite{thchs30} and hkust~\cite{hkust1}, a large-scale high-quality free corpus is still needed.
 
 In AISHELL-1~\cite{aishell1}, we released 170 hours of Mandarin speech with high quality human transcriptions. 
-Various training and evaluation recipes based on such corpus have been developed in Kaldi~\cite{kaldi}, 
-which is a robust and widely-acknowledged framework for speech research. 
-To the best knowledge of the authors, it is the first fully open-sourced system for Mandarin ASR with 
-high quality Mandarin speech data(e.g. ~\cite{do2017, do2018_1, do2018_2}).
+Various training and evaluation recipes based on such corpus have been developed in Kaldi~\cite{kaldi}, which is a robust and widely-acknowledged framework for speech research. 
+To the best knowledge of the authors, it is the first fully open-sourced system for Mandarin ASR with high quality Mandarin speech data(e.g. ~\cite{do2017, do2018_1, do2018_2}).
 
-Furthering the success from AISHELL-1 with efforts, in this paper, we introduce AISHELL-2, 
-an open-sourced, self-contained baseline for industrial-scale Mandarin ASR research. 
-On one hand, 1000 hours of iPhone-recorded speech data is released. On the other hand, baseline recipes(containing must-have components such as Chinese word segmentation, 
-customizable Chinese lexicon etc) are published into Kaldi, following what have been done with AISHELL-1 formally.
+Furthering the success from AISHELL-1 with efforts, in this paper, we introduce AISHELL-2, an open-sourced, self-contained baseline for industrial-scale Mandarin ASR research. 
+On one hand, 1000 hours of iPhone-recorded speech data is released. On the other hand, baseline recipes(containing must-have components such as Chinese word segmentation, customizable Chinese lexicon etc) are published into Kaldi, following what have been done with AISHELL-1 formally.
 Moreover, besides training data(iOS), we release development and test data from 3 acoustic channels(iOS, Android and Mic).
 We hope these resources would be helpful to transform Mandarin ASR research into industrial scale.
 
@@ -66,7 +57,7 @@ presents system performance on test sets from different acoustic channels.
 
 \section{AISHELL-2 corpus}
 
-AISHELL-2 corpus contains 1000 hours of clean read-speech data, which will be released to academic research community for free. Raw data was recorded via three parallel acoustic channels - a high fidelity microphone (Mic), an Android smartphone (Android) and an iPhone (iOS). The relative position between speaker and devices are shown in Figure~\ref{fig:setup}. Data from iPhone, i.e. the iOS channel is open-sourced. Speaker, environment and content coverage are explained as below:
+AISHELL-2 corpus contains 1000 hours of clean reading-speech data, which will be released to academic research community for free. Raw data was recorded via three parallel acoustic channels - a high fidelity microphone (Mic), an Android smartphone (Android) and an iPhone (iOS). The relative position between speaker and devices are shown in Figure~\ref{fig:setup}. Data from iPhone, i.e. the iOS channel is open-sourced. Speaker, environment and content coverage are explained as below:
 \begin{itemize}
 \item \textbf{Speaker information.} There are 1991 speakers participated in the recording, including 845 male and 1146 female. Age of speaker ranges from 11 to over 40. Ideally the speakers shall speak everything to be recorded in Mandarin, while there are some slight accent variations. Generally speaking of the accents, there were 1293 speakers using Northern ones, 678 speakers using Southern ones and 20 speakers use other accents during recording. 
 \item \textbf{Recording environment.} 1347 speakers are recorded in a studio, while the rest are in a living room with natural reverberation.
@@ -126,26 +117,26 @@ script to segment AISHELL-2 transcription and language model text.
 
 \subsection{Acoustic model}
 
-Acoustic training contains two stages: GMM-HMM state model training based on maximum likelihood and later the training of a hybrid DNN-HMM state estimator. Both can be implemented by calling standard methods and designing corresponding recipes under the framework of Kaldi.
+Acoustic training contains two stages: GMM-HMM state model training based on maximum likelihood and later the training of a hybrid DNN-HMM state estimator. Both can be implemented by calling standard methods and designing corresponding recipes in Kaldi toolkit.
 
 The GMM models were firstly trained using 13 dimensional MFCC plus pitches, which made the input dimension 16.
 A monophone model was trained to set a starting point for the triphone models. A small triphone model and a larger triphone model were then consecutively trained using delta features. After that, a more sophisticated feature transform method was applied to replace the delta features. Linear discriminant analysis (LDA) was applied on stack of frames to reduce the dimension and MLLT-based global transform is estimated iteratively. This follows a standard setup pipeline in the majority of available Kaldi recipes. The resulting number of physical GMM states from the four steps were 605, 3216, 5720 and 8080 respectively.
 
-GMM training of the AISHELL-2 stopped at the speaker independent stage without speaker dependent transform involved, such as fMLLR. For industrial-scale corpus, it is not worth spending too much time and computation power at GMM-HMM training stage, since the final system performance primarily depends on later neural network models. Therefore, we adopted speaker independent GMM training and pushed the speaker dependent steps to later DNN training phase, as described below.
+GMM training of the AISHELL-2 stopped at the speaker independent stage, without speaker dependent transform involved, such as fMLLR. For industrial-scale corpus, it is not worth spending too much time and computation power at GMM-HMM training stage, since the final system performance primarily depends on later neural network models. Therefore, we adopted speaker independent GMM training and pushed the speaker dependent steps to later DNN training phase, as described below.
 
-Based on the tri-state alignments provided by GMM stages above, a time-delayed neural network (TDNN, \cite{tdnn}) is then configured and trained. It has 8 layers in total with 1280 hidden units in each layer. It is, as described in \cite{tdnn}, not fully connected - the input of each hidden layer is a frame-wise spliced output of its preceding layer. The input feature was high resolution MFCC with cepstral normalization plus pitches, which made its dimension 43. Note that for each frame-wise input a 100-dimensional i-vector~\cite{ivector} was also attached, whose extractor was trained based on the corpus itself. The corresponding diagonal universal background model (UBM) was trained using a quarter of training features. This indicates that different from GMM-level training, we encoded speaker information here to produce a stronger baseline for research community. The network was trained using lattice-free maximum mutual information (LFMMI, \cite{lfmmi}) as the objective function. More configurations about NN training itself such as lattice generation and tree topology can be found at \cite{lfmmi} and AISHELL-2 exemplar scripts in Kaldi repository \footnote{https://github.com/kaldi-asr/kaldi/egs/aishell2}.
+Based on the tied-triphone state alignments from GMM, a time-delayed neural network (TDNN, \cite{tdnn}) is then configured and trained. It has 8 layers in total, with 1280 hidden units in each layer. It is, as described in \cite{tdnn}, not fully connected - the input of each hidden layer is a frame-wise spliced output of its preceding layer. The input feature was high-resolution MFCC with cepstral normalization plus pitches, which made its dimension 43. Note that for each frame-wise input a 100-dimensional i-vector~\cite{ivector} was also attached, whose extractor was trained based on the corpus itself. The corresponding diagonal universal background model (UBM) was trained using a quarter of training features. This indicates that different from GMM-level training, we encoded speaker information here to produce a stronger baseline for research community. The network was trained using lattice-free maximum mutual information (LFMMI, \cite{lfmmi}) as the objective function. More configurations about NN training itself such as lattice generation and tree topology can be found at \cite{lfmmi} and AISHELL-2 exemplar scripts in Kaldi repository \footnote{https://github.com/kaldi-asr/kaldi/egs/aishell2}.
 
 \subsection{Language model}
 
-A trigram language model was trained on a 5.7 million-word database. Out-of-vocabulary (OOV) words were mapped as $<$UNK$>$. The 3-order ARPA language model is trained using Kneser-Ney smoothing. The final model had 516552 unigrams, 1498603 bigrams and 932475 trigrams.
+A trigram language model was trained on 5.7 million-word speech transcripts from AISHELL-2. Out-of-vocabulary (OOV) words were mapped as $<$UNK$>$. The 3-order ARPA language model is trained using Kneser-Ney smoothing, with 516552 unigrams, 1498603 bigrams and 932475 trigrams, respectively.
 
 \section{Experiment and evaluations}
 
-Speaking of hardware, the presented baseline system was trained on a standalone server, with 36 cores of Intel Xeon (2.3GHz) for all cpu-based steps and 4
+Presented baseline system was trained on a standalone server, with 36 cores of Intel Xeon (2.3GHz) for all cpu-based steps and 4
 Tesla K80 processors for DNN model training. Character Error Rate (CER) was used as the evaluation metric. 
 
-Results along with the total training time of each stage, which was counted in unit of hours, are presented in Table~\ref{tab:base}. 
-Note that as to keep consistency with future community usage, during training we only used open-sourced iOS data from the beginning to the end while evaluated these models on dev and test sets for all 3 channels (Android, Mic, and iOS). System performance on iOS outperformed Android and Mic, which is as expected due to better acoustic channel condition matching.
+Results along with training time of each stage, are presented in Table~\ref{tab:base}. 
+Note that during training, we only used open-sourced iOS data, while evaluated these models on dev and test sets for all 3 channels (Android, Mic, and iOS). System performance on iOS outperformed Android and Mic, which is as expected due to better acoustic channel condition matching.
 
 \begin{table*}[th]
   \caption{Baseline system results and training time}
@@ -153,7 +144,7 @@ Note that as to keep consistency with future community usage, during training we
   \centering
   \begin{tabular}{ llllllll }
     \toprule
-    CER               &  dev\_android           &  dev\_ios           &  dev\_mic           & test\_android            &  test\_ios           &  test\_mic          &  Training time         \\
+    CER               &  dev\_android           &  dev\_ios           &  dev\_mic           & test\_android            &  test\_ios           &  test\_mic          &  Training time in hours         \\
     \midrule
     Mono        &  47.08                 &  43.37             &  47.33             &  45.40                  &  44.81              &  44.28             &  0.5                   \\
     tri1    &  26.61                 &  22.94             &  26.55             &  26.08                  &  24.79              &  25.36             &  1                     \\
@@ -163,22 +154,6 @@ Note that as to keep consistency with future community usage, during training we
     \bottomrule
   \end{tabular}
 \end{table*}
-
-% \begin{table*}[th]
-%  \caption{Transfer learning results}
-%  \label{tab:trans}
-%  \centering
-%  \begin{tabular}{ lllllll }
-%    \toprule
-%    CER               &  dev\_android           &  dev\_ios           &  dev\_mic           &  test\_android           &  test\_ios           &  test\_mic     \\
-%    \midrule
-%    Baseline          &  15.04                 &  11.75             &  16.96             &  12.78                  &  11.18              &  14.92        \\
-%    Channel transfer  &  12.88                 &  12.16             &  12.13             &  11.65                  &  11.48              &  10.79        \\
-%    Domain transfer   &  8.07                  &  6.65              &  9.16              &  6.65                   &  5.63               &  8.05         \\
-%    Combined transfer &  6.66                  &  6.43              &  6.21              &  5.97                   &  5.77               &  5.48         \\
-%    \bottomrule
-%  \end{tabular}
-% \end{table*}
 
 % \section{Customizing a speech recognition system}
 % 
@@ -230,7 +205,7 @@ Note that as to keep consistency with future community usage, during training we
 
 \section{Conclusions}
 
-In this paper, we generally introduce AISHELL-2, a 1000 hour Mandarin ASR corpus which is freely available to research community for building industrial scale speech solutions, as well as its following utilities and some details about the pipeline for baseline results. We hope this open-source project is able to provide essential ingredients for researchers to explore more scalable and practical solutions regarding to industrial issues in the field of Mandarin speech recognition and will keep improving it from every aspect.
+In this paper, we generally introduce AISHELL-2, a 1000-hour Mandarin ASR corpus, freely available to research community. In the meantime, we present a self-contained recipe in Kaldi toolkit as a research baseline. We hope this open-source project provides essential ingredients for researchers to explore more scalable and practical solutions regarding to industrial scenarios for Mandarin speech recognition.
 
 \section{Acknowledgements}
 
