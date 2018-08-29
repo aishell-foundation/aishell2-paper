@@ -2,6 +2,7 @@
 
 \usepackage{INTERSPEECH2018}
 \usepackage{subfigure}
+\usepackage{stfloats}
 
 \title{AISHELL-2: Transforming Mandarin ASR Research Into Industrial Scale}
 \name{Jiayu Du$^1$, Xingyu Na$^1$, Xuechen Liu$^1$, Hui Bu$^2$}
@@ -22,10 +23,10 @@ training and testing pipelines for Mandarin ASR. In AISHELL-2, 1000 hours of
 clean read-speech data from iOS is published, which is free for academic usage. On top of
 AISHELL-2 corpus, an improved recipe is developed and released, containing key
 components for industrial applications, such as Chinese word segmentation,
-flexible vocabulary expension and phone set transformation etc. 
+flexible vocabulary expension and phone set transformation etc.
 Pipelines support various state-of-the-art techniques, such
-as time-delayed neural networks and Lattic-Free MMI objective funciton. 
-In addition, we also release dev and test data from other channels(Android and Mic). 
+as time-delayed neural networks and Lattic-Free MMI objective funciton.
+In addition, we also release dev and test data from other channels(Android and Mic).
 For research community, we hope that AISHELL-2
 corpus can be a solid resource for topics like transfer learning and robust
 ASR. For industry, we hope AISHELL-2 recipe can be a helpful reference for
@@ -38,36 +39,36 @@ building meaningful industrial systems and products.
 Automatic Speech Recognition (ASR) is a major application domain in the bloom of Artificial
 Intelligence (AI). Huge effort has been made from both research community and industry to improve ASR system performance. Among all solutions proposed, deep learning approach has been dominating for the last half decade. Given enough data, neural network (NN) models generally perform better in terms of recognition accuracy, and turn out to be more robust.
 From industrial perspective, accessing and collecting large amount of speech data has become easier than ever before, with emerging market of smart phones and various other smart devices.
-However, on the other hand, research community still has limited-access to real-world application data. As a result, improvements in research community do not always scale well to industrial scenarios. 
-In computer vision, there are many high quality free data sets which transform research efforts into industrial applications, such as ImageNet~\cite{imagenet} and COCO~\cite{coco}. 
+However, on the other hand, research community still has limited-access to real-world application data. As a result, improvements in research community do not always scale well to industrial scenarios.
+In computer vision, there are many high quality free data sets which transform research efforts into industrial applications, such as ImageNet~\cite{imagenet} and COCO~\cite{coco}.
 In Mandarin ASR, although there are corpus like thchs30~\cite{thchs30} and hkust~\cite{hkust1}, a large-scale high-quality free corpus is still needed.
 
-In AISHELL-1~\cite{aishell1}, we released 170 hours of Mandarin speech with high quality human transcriptions. 
-Various training and evaluation recipes based on such corpus have been developed in Kaldi~\cite{kaldi}, which is a robust and widely-acknowledged framework for speech research. 
+In AISHELL-1~\cite{aishell1}, we released 170 hours of Mandarin speech with high quality human transcriptions.
+Various training and evaluation recipes based on such corpus have been developed in Kaldi~\cite{kaldi}, which is a robust and widely-acknowledged framework for speech research.
 To the best knowledge of the authors, it is the first fully open-sourced system for Mandarin ASR with high quality Mandarin speech data(e.g. ~\cite{do2017, do2018_1, do2018_2}).
 
-Furthering the success from AISHELL-1 with efforts, in this paper, we introduce AISHELL-2, an open-sourced, self-contained baseline for industrial-scale Mandarin ASR research. 
+Furthering the success from AISHELL-1 with efforts, in this paper, we introduce AISHELL-2, an open-sourced, self-contained baseline for industrial-scale Mandarin ASR research.
 On one hand, 1000 hours of iPhone-recorded speech data is released. On the other hand, baseline recipes(containing must-have components such as Chinese word segmentation, customizable Chinese lexicon etc) are published into Kaldi, following what have been done with AISHELL-1 formally.
 Moreover, besides training data(iOS), we release development and test data from 3 acoustic channels(iOS, Android and Mic).
 We hope these resources would be helpful to transform Mandarin ASR research into industrial scale.
 
-The rest of this paper is organized as follows: The details of AISHELL-2 corpus data is introduced in Section 2. 
-Section 3 describes the Mandarin ASR pipeline for producing baseline system and Section 4 
+The rest of this paper is organized as follows: The details of AISHELL-2 corpus data is introduced in Section 2.
+Section 3 describes the Mandarin ASR pipeline for producing baseline system and Section 4
 presents system performance on test sets from different acoustic channels.
 
 \section{AISHELL-2 corpus}
 
 AISHELL-2 corpus contains 1000 hours of clean reading-speech data, which will be released to academic research community for free. Raw data was recorded via three parallel acoustic channels - a high fidelity microphone (Mic), an Android smartphone (Android) and an iPhone (iOS). The relative position between speaker and devices are shown in Figure~\ref{fig:setup}. Data from iPhone, i.e. the iOS channel is open-sourced. Speaker, environment and content coverage are explained as below:
 \begin{itemize}
-\item \textbf{Speaker information.} There are 1991 speakers participated in the recording, including 845 male and 1146 female. Age of speaker ranges from 11 to over 40. Ideally the speakers shall speak everything to be recorded in Mandarin, while there are some slight accent variations. Generally speaking of the accents, there were 1293 speakers using Northern ones, 678 speakers using Southern ones and 20 speakers use other accents during recording. 
+\item \textbf{Speaker information.} There are 1991 speakers participated in the recording, including 845 male and 1146 female. Age of speaker ranges from 11 to over 40. Ideally the speakers shall speak everything to be recorded in Mandarin, while there are some slight accent variations. Generally speaking of the accents, there were 1293 speakers using Northern ones, 678 speakers using Southern ones and 20 speakers use other accents during recording.
 \item \textbf{Recording environment.} 1347 speakers are recorded in a studio, while the rest are in a living room with natural reverberation.
 \item \textbf{Content of speech}. The content of the recording covers 8 major topics: voice commands such as IoT device control and digital sequential input, places of interest, entertainment, finance, technology, sports, English spellings and free speaking without specific topic. The total number of prompts is around half a million.
 \end{itemize}
 
-\noindent Aside from AISHELL-2 corpus introduced above, which is supposed to be used for training, 
-we also provide development and test sets. 
-Development set contains 2500 utterances from 5 speakers and test set contains 5000 utterances from 10 speakers. 
-Each speaker contributed approximately half an hour of speech, covering 500 prompts. 
+\noindent Aside from AISHELL-2 corpus introduced above, which is supposed to be used for training,
+we also provide development and test sets.
+Development set contains 2500 utterances from 5 speakers and test set contains 5000 utterances from 10 speakers.
+Each speaker contributed approximately half an hour of speech, covering 500 prompts.
 First 7 prompts of all speakers are extracted from high frequency online queries. Speaker-gender is balanced as well.
 
 \begin{figure}[h]
@@ -83,9 +84,9 @@ As briefly mentioned in Section 1, based on AISHELL-2 corpus, several recipes ar
 
 \subsection{Lexicon and word segmentation}
 
-Unlike English ASR system, Mandarin ASR often requires sophisticated word segmentation. 
+Unlike English ASR system, Mandarin ASR often requires sophisticated word segmentation.
 In AISHELL-1, word segmentation was implemented via forward
-maximum matching algorithm \textbf{[Ref?]}, based on a variation of open-source mandarin
+maximum matching algorithm, based on a variation of open-source mandarin
 dictionary CC-CEDIT\footnote{https://cc-cedict.org/wiki}. In AISHELL-2, an
 open-source Chinese dictionary called DaCiDian is
 released\footnote{https://github.com/aishell-foundation/DaCiDian}. In most
@@ -132,13 +133,7 @@ A trigram language model was trained on 5.7 million-word speech transcripts from
 
 \section{Experiment and evaluations}
 
-Presented baseline system was trained on a standalone server, with 36 cores of Intel Xeon (2.3GHz) for all cpu-based steps and 4
-Tesla K80 processors for DNN model training. Character Error Rate (CER) was used as the evaluation metric. 
-
-Results along with training time of each stage, are presented in Table~\ref{tab:base}. 
-Note that during training, we only used open-sourced iOS data, while evaluated these models on dev and test sets for all 3 channels (Android, Mic, and iOS). System performance on iOS outperformed Android and Mic, which is as expected due to better acoustic channel condition matching.
-
-\begin{table*}[th]
+\begin{table*}[tp]
   \caption{Baseline system results and training time}
   \label{tab:base}
   \centering
@@ -155,8 +150,14 @@ Note that during training, we only used open-sourced iOS data, while evaluated t
   \end{tabular}
 \end{table*}
 
+Presented baseline system was trained on a standalone server, with 36 cores of Intel Xeon (2.3GHz) for all cpu-based steps and 4
+Tesla K80 processors for DNN model training. Character Error Rate (CER) was used as the evaluation metric.
+
+Results along with training time of each stage, are presented in Table~\ref{tab:base}.
+Note that during training, we only used open-sourced iOS data, while evaluated these models on dev and test sets for all 3 channels (Android, Mic, and iOS). System performance on iOS outperformed Android and Mic, which is as expected due to better acoustic channel condition matching.
+
 % \section{Customizing a speech recognition system}
-% 
+%
 % One major barrier that stops the transforming from research prototypes into
 % industrial applications is the scale of training data. Now that AISHELL-2 corpus
 % and baseline system have been released, the potential of transforming the
@@ -166,9 +167,9 @@ Note that during training, we only used open-sourced iOS data, while evaluated t
 % knowledge of a baseline system into a specific scenario which suits the target
 % application. The knowledge include the channel through which the speech data is
 % collected, and the language domain context of target applications.
-% 
+%
 % \subsection{Acoustic channel fine-tuning}
-% 
+%
 % Table~\ref{tab:base} shows that channel mismatch introduces significant
 % performance decay. To alleviate this type of problem, various adaptation and
 % transfer learning techniques have been proposed, depending on the amount of
@@ -183,9 +184,9 @@ Note that during training, we only used open-sourced iOS data, while evaluated t
 % improved. Meanwhile, there is slight regression of the performance on the
 % android subset. The performance on the android subset is also improved, which
 % might due to better robustness of the acoustic model.
-% 
+%
 % \subsection{Language domain adaptation}
-% 
+%
 % The domain of language model is also crucial for applicational ASR
 % systems. LM training text of AISHELL-2 are mostly collected from smart-home
 % domain. In order to demonstrate domain transfer, we delibrately designed dev and
@@ -196,7 +197,7 @@ Note that during training, we only used open-sourced iOS data, while evaluated t
 % baseline LM using a weight of 0.5. During evaluation, the baseline AM is coupled
 % with this interpolated LM. Table~\ref{tab:trans} shows that, by applying domain
 % transfer, CER is decreased by approximately 45\% on all the subsets.
-% 
+%
 % Furthermore, we combined the finetuned AM with the interpolated LM. The results
 % are shown in the last row of Table~\ref{tab:trans}. The CER of all subsets for
 % all channels are further decreased to around 6\%, suggesting that the robustness
